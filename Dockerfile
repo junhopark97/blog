@@ -10,8 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-RUN pip3 install django \
-    && python3 -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade pip
 # python:3.10.4 이미지 상에 django를 pip를 통해 설치합니다.
 
 WORKDIR /usr/src/app
