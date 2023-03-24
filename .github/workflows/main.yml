@@ -11,8 +11,8 @@ on:
 
 env:
   DOCKER_IMAGE: ghcr.io/kkams/deploy-project
-  VERSION: ${{ github.sha }}
-  NAME: go_cicd
+  # VERSION: ${{ github.sha }}
+  NAME: docker_build
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
