@@ -11,7 +11,7 @@ on:
 
 env:
   DOCKER_IMAGE: ghcr.io/kkams/deploy-project
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: project
   # VERSION: ${{ github.sha }}
   # NAME: docker_build
 
