@@ -1,4 +1,4 @@
-# project
+# Github 자동 배포 프로젝트
 github action + docker
 
 1. github Repository secrets 설정 <br>
