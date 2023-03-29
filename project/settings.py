@@ -93,15 +93,6 @@ DATABASES = {
         'PASSWORD': env('PASSWORD'),
         'HOST': env('HOST'),
         'PORT': env('PORT'),
-
-        # 'NAME': 'project',
-        # 'USER': 'root',
-        # 'PASSWORD': 'qwer1234',
-        # 'HOST': 'localhost',
-        # 'PORT': '3306',
-
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db' / 'db.sqlite3',
     }
 }
 
