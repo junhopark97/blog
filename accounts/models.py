@@ -4,20 +4,18 @@ from django.db import models
 from accounts.managers import UserManager
 
 
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        abstract = True
-
-
 class User(AbstractUser):
-    username = None
+    class GenderStatus(models.TextChoices):
+        FEMALE = 'F'
+        MALE = 'M'
     first_name = None
     last_name = None
 
     email = models.EmailField('email', max_length=40, unique=True)
+    gender = models.CharField(
+        choices=GenderStatus.choices, default=GenderStatus.MALE, max_length=1
+    )
+    # gender = models.CharField(max_length=1, choices=(('F', 'female'), ('M', 'male')), default='M')
     phone_number = models.CharField(max_length=20, unique=True)
 
     USERNAME_FIELD = 'email'
