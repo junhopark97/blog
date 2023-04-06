@@ -20,6 +20,6 @@ from blog.urls import post_router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/blog/', include('blog.urls')),
-    path('', include(post_router.urls), name='post')
+    path('', include(post_router.urls), name='post'),
+    path('api/', include('accounts.urls')),
 ]
