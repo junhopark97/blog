@@ -1,7 +1,7 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.jwt import MyTokenObtainPairSerializer
 from accounts.models import User
@@ -52,3 +52,32 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'refresh': refresh_token,
         }
 
+
+class UserLoginSerializer(serializers.Serializer):  # noqa
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(
+        required=True, write_only=True,
+    )
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+        user = authenticate(email=email, password=password)
+        print(user)
+
+        if user is None:
+            raise serializers.ValidationError(
+                'A user with this email and password is not found.'
+            )
+
+        try:
+            token = MyTokenObtainPairSerializer.get_token(user)
+            return {
+                'access_token': str(token.access_token),
+                'refresh_token': str(token)
+            }
+
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                'User with given email and password does not exists'
+            )
