@@ -21,10 +21,17 @@ class UserLoginView(generics.GenericAPIView):
         # print(serializer.__dict__)
 
         token = serializer.validated_data
-        return Response(
+        res = Response(
             {
-                'success': True,
                 'token': token,
+                'message': 'Login success',
             },
             status=status.HTTP_200_OK,
         )
+        res.set_cookie(
+            key='jwt',
+            value=token,
+            httponly=True,
+        )
+
+        return res

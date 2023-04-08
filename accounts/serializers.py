@@ -63,7 +63,6 @@ class UserLoginSerializer(serializers.Serializer):  # noqa
         email = data.get('email')
         password = data.get('password')
         user = authenticate(email=email, password=password)
-        print(user)
 
         if user is None:
             raise serializers.ValidationError(
