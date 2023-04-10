@@ -1,16 +1,7 @@
-# Github 자동 배포 프로젝트
-github action + docker
-
-1. github Repository secrets 설정 <br>
-   ex) DOCKERHUB_TOKEN, DOCKERHUB_USERNAME
-2. github workflow 작성 (참조 1, 2)
-3. Dockerfile 작성
+# blog_project
 
 - - -
-
-<br>
-※ 참조 
-<br>
-1. https://docs.docker.com/build/ci/github-actions/
-<br>
-2. https://github.com/docker/build-push-action
+### API Document
+| 기능 | Http Method | API |
+| --- | --- | --- | --- |
+| 회원가입 | POST | /account/register/
