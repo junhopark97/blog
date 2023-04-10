@@ -2,8 +2,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from accounts.models import User
-from accounts.serializers import UserRegisterSerializer, UserLoginSerializer
+from accounts.serializers import UserRegisterSerializer, UserLoginSerializer, UserVerifySerializer
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -35,3 +34,31 @@ class UserLoginView(generics.GenericAPIView):
         )
 
         return res
+
+
+class UserVerifyView(generics.GenericAPIView):
+    serializer_class = UserVerifySerializer
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        serializer = self.get_serializer(data=request)
+        data = serializer.to_internal_value(request)
+
+        if 'access_token' in data:
+            # access 토큰 갱신.
+            res = Response(
+                {
+                    'token': data,
+                    'message': 'Access token renewal successful',
+                },
+                status=status.HTTP_200_OK,
+            )
+            res.set_cookie(
+                key='jwt',
+                value=data,
+                httponly=True,
+            )
+            return res
+
+        return Response(data)
+

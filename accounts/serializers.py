@@ -1,10 +1,17 @@
+import json
+
+import jwt
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from environ import Env
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from accounts.jwt import MyTokenObtainPairSerializer
 from accounts.models import User
+
+env = Env()
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -80,3 +87,48 @@ class UserLoginSerializer(serializers.Serializer):  # noqa
             raise serializers.ValidationError(
                 'User with given email and password does not exists'
             )
+
+
+class UserVerifySerializer(serializers.BaseSerializer):  # noqa
+    def to_internal_value(self, data):
+        global jwt_dict
+        jwt_cookie = data.COOKIES.get('jwt')
+        jwt_cookie = jwt_cookie.replace("\'", "\"")
+
+        if not jwt_cookie:
+            return {'message': 'JWT token not found.'}
+
+        try:
+            jwt_dict = json.loads(jwt_cookie)
+            access_token = jwt_dict.get('access_token')
+
+            if not access_token:
+                return {'message': 'Access token not found in JWT cookie.'}
+
+            access_payload = jwt.decode(access_token, env('SECRET_KEY'), algorithms=['HS256'])
+            # 유저 데이터 확인.
+
+            return {'message': 'JWT token is valid.'}
+
+        except jwt.ExpiredSignatureError:
+            # access 토큰 만료.
+            refresh_token = jwt_dict.get('refresh_token', None)
+
+            if not refresh_token:
+                return {'message': 'Refresh token not found in JWT cookie.'}
+
+            try:
+                refresh_data = {'refresh': refresh_token}
+                serializer = TokenRefreshSerializer(data=refresh_data)
+
+                if serializer.is_valid(raise_exception=True):
+                    # access 토큰 갱신
+                    new_access_token = serializer.validated_data['access']
+
+                    return {
+                        'access_token': str(new_access_token),
+                        'refresh_token': str(refresh_token),
+                    }
+
+            except (jwt.exceptions.DecodeError, jwt.ExpiredSignatureError):
+                raise serializers.ValidationError('Failed to refresh access token.')
