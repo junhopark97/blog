@@ -1,7 +1,11 @@
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework import generics, status
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from accounts.permissions import CustomerAccessPermission
 from accounts.serializers import UserRegisterSerializer, UserLoginSerializer, UserVerifySerializer
 
 
@@ -17,28 +21,27 @@ class UserLoginView(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # print(serializer.__dict__)
 
         token = serializer.validated_data
-        res = Response(
+        response = Response(
             {
                 'token': token,
                 'message': 'Login success',
             },
             status=status.HTTP_200_OK,
         )
-        res.set_cookie(
+        response.set_cookie(
             key='jwt',
             value=token,
             httponly=True,
         )
 
-        return res
+        return response
 
 
 class UserVerifyView(generics.GenericAPIView):
     serializer_class = UserVerifySerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (CustomerAccessPermission,)
 
     def get(self, request):
         serializer = self.get_serializer(data=request)
@@ -46,19 +49,41 @@ class UserVerifyView(generics.GenericAPIView):
 
         if 'access_token' in data:
             # access 토큰 갱신.
-            res = Response(
+            response = Response(
                 {
                     'token': data,
                     'message': 'Access token renewal successful',
                 },
                 status=status.HTTP_200_OK,
             )
-            res.set_cookie(
+            response.set_cookie(
                 key='jwt',
                 value=data,
                 httponly=True,
             )
-            return res
+            return response
 
         return Response(data)
 
+
+class UserLogoutView(APIView):
+    permission_classes = (CustomerAccessPermission,)
+
+    def post(self, request):
+        try:
+            response = Response(
+                {
+                    'message': 'Logout Successful',
+                },
+                status=status.HTTP_200_OK,
+            )
+            response.delete_cookie(key='jwt')
+
+            return response
+        except ImproperlyConfigured as e:
+            print(e)
+            raise APIException('An error occurred during logout')
+
+        except Exception as e:
+            print(e)
+            raise APIException('An error occurred during logout')

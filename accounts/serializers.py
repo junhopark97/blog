@@ -3,6 +3,8 @@ import json
 import jwt
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from environ import Env
@@ -15,6 +17,9 @@ env = Env()
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
+    '''
+        회원가입
+    '''
     email = serializers.EmailField(
         required=True, validators=[UniqueValidator(queryset=User.objects.all())],
     )
@@ -61,6 +66,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):  # noqa
+    '''
+        로그인
+    '''
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
         required=True, write_only=True,
@@ -90,28 +98,37 @@ class UserLoginSerializer(serializers.Serializer):  # noqa
 
 
 class UserVerifySerializer(serializers.BaseSerializer):  # noqa
+    '''
+        JWT 토큰 유효성 검증 및 갱신.
+    '''
     def to_internal_value(self, data):
         global jwt_dict
-        jwt_cookie = data.COOKIES.get('jwt')
-        jwt_cookie = jwt_cookie.replace("\'", "\"")
+        jwt_token = data.COOKIES.get('jwt')
+        jwt_token = jwt_token.replace("\'", "\"")
 
-        if not jwt_cookie:
+        if not jwt_token:
             return {'message': 'JWT token not found.'}
 
         try:
-            jwt_dict = json.loads(jwt_cookie)
+            jwt_dict = json.loads(jwt_token)
             access_token = jwt_dict.get('access_token')
 
             if not access_token:
                 return {'message': 'Access token not found in JWT cookie.'}
 
-            access_payload = jwt.decode(access_token, env('SECRET_KEY'), algorithms=['HS256'])
             # 유저 데이터 확인.
+            access_payload = jwt.decode(access_token, env('SECRET_KEY'), algorithms=['HS256'])
+            pk = access_payload.get('user_id')
+            email = access_payload.get('email')
+            try:
+                user = get_object_or_404(User, pk=pk, email=email)
+            except Http404:
+                return {'massage': 'The user information for the access token is invalid.'}
 
             return {'message': 'JWT token is valid.'}
 
         except jwt.ExpiredSignatureError:
-            # access 토큰 만료.
+            # access 토큰 만료시.
             refresh_token = jwt_dict.get('refresh_token', None)
 
             if not refresh_token:
@@ -122,8 +139,16 @@ class UserVerifySerializer(serializers.BaseSerializer):  # noqa
                 serializer = TokenRefreshSerializer(data=refresh_data)
 
                 if serializer.is_valid(raise_exception=True):
-                    # access 토큰 갱신
+                    # access 토큰 갱신.
                     new_access_token = serializer.validated_data['access']
+                    new_access_payload = jwt.decode(new_access_token, env('SECRET_KEY'), algorithms=['HS256'])
+                    pk = new_access_payload.get('user_id')
+                    email = new_access_payload.get('email')
+
+                    try:
+                        user = get_object_or_404(User, pk=pk, email=email)
+                    except Http404:
+                        return {'massage': 'The user information for the access token is invalid.'}
 
                     return {
                         'access_token': str(new_access_token),
@@ -131,4 +156,5 @@ class UserVerifySerializer(serializers.BaseSerializer):  # noqa
                     }
 
             except (jwt.exceptions.DecodeError, jwt.ExpiredSignatureError):
+                # access 토큰, refresh 토큰 만료 시.
                 raise serializers.ValidationError('Failed to refresh access token.')
