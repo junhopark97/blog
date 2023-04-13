@@ -23,7 +23,7 @@ def user_data():
     return {
         'email': 'test@example.com',
         'username': 'test',
-        'password': 'password',
+        'password': 'password1234!',
         'phone_number': '0100000000',
         'gender': User.GenderStatus.MALE,
     }
@@ -33,8 +33,8 @@ def user_data():
 def user_info():
     return {
         'email': 'test@example.com',
-        'password': 'qwer1234!',
-        'password2': 'qwer1234!',
+        'password': 'password1234!',
+        'password2': 'password1234!',
         'gender': User.GenderStatus.MALE,
         'username': 'test',
         'phone_number': '01000000000',
@@ -52,7 +52,7 @@ def test_create_user(user_data):
     assert not user.is_superuser
 
 
-def test_register(api_client, user_info):
+def test_create_user_success(api_client, user_info):
     response = api_client.post(reverse('register'), user_info, format='json')
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data['email'] == user_info['email']
@@ -70,16 +70,43 @@ def test_register(api_client, user_info):
     assert verify_refresh.get('email') == user_info['email']
     assert verify_refresh.get('user_id') == str(User.objects.get(email=user_info['email']).id)
 
-    # Updated assertion to expect a 400 status code
+    # 같은 이메일로 유저 생성시 실패.
+    response = api_client.post(reverse('register'), user_info, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.parametrize(
+    ('email', 'password', 'password2', 'gender', 'username', 'phone_number'),
+    [
+        pytest.param('test@example.com', 'password', 'password', 'M', 'test', '01000000000'),
+        pytest.param('test@example.com', 'password1234!', 'password', 'M', 'test', '01000000000'),
+        pytest.param('test@example.com', 'password', 'password', 'M', '', '01000000000'),
+        pytest.param('test@example.com', 'password', 'password', 'M', 'test', ''),
+    ],
+)
+def test_user_creation_must_fail(api_client, email, password, password2, gender, username, phone_number):
+    '''
+        유저 생성 실패.
+    '''
     response = api_client.post(reverse('register'), {
-        'email': 'test@example.com',
-        'password': 'password',
-        'phone_number': '01000000000',
+        'email': email,
+        'password': password,
+        'password2': password2,
+        'gender': gender,
+        'username': username,
+        'phone_number': phone_number,
     }, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-def test_login(api_client, user_data):
+@pytest.mark.parametrize(
+    ('email', 'password'),
+    [
+        pytest.param('test@example.com', 'password'),
+        pytest.param('test1@example.com', 'password1234!'),
+    ],
+)
+def test_user_login(api_client, user_data, email, password):
     User.objects.create_user(**user_data)
     response = api_client.post(reverse('login'), {
         'email': user_data['email'],
@@ -97,16 +124,35 @@ def test_login(api_client, user_data):
     assert verify_access.get('email') == user_data['email']
     assert verify_refresh.get('email') == user_data['email']
 
+    # 로그인 실패.
     response = api_client.post(reverse('login'), {
-        'email': user_data['email'],
-        'password': 'wrongpassword',
+        'email': email,
+        'password': password,
     }, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert 'token' not in response.data
 
-    response = api_client.post(reverse('login'), {
-        'email': 'wrongemail@example.com',
+
+@pytest.fixture
+def jwt_token(api_client, user_data, user_info):
+    User.objects.create_user(**user_data)
+    user = api_client.post(reverse('login'), {
+        'email': user_data['email'],
         'password': user_data['password'],
     }, format='json')
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert 'token' not in response.data
+    jwt_token = user.data['token']
+
+    return jwt_token
+
+
+def test_user_logout_success(api_client, jwt_token):
+    api_client.cookies['jwt'] = jwt_token
+
+    response = api_client.post(reverse('logout'), format='json')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['message'] == 'Logout Successful'
+
+
+def test_logout_fail(api_client):
+    response = api_client.post(reverse('logout'), format='json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
