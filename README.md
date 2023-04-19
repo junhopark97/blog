@@ -5,12 +5,12 @@
 
 ## 📚 API Document
 ### 👤 USER
-| 기능                                                                                                                                   |Http Method| API                |
-|--------------------------------------------------------------------------------------------------------------------------------------|---|--------------------|
-| [회원가입](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/serializers.py#L19)             |POST| /account/register/ |
-| [로그인](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/views.py#L17)                    |POST| /account/login/    |
-| [로그아웃](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/views.py#L69)                   |POST| /account/logout/   |
-| [JWT 유효성 검증 및 갱신](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/serializers.py#L100) |GET| /account/verify/   |
+| 기능                                                                                                                                   |Http Method| API          |
+|--------------------------------------------------------------------------------------------------------------------------------------|---|--------------|
+| [회원가입](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/serializers.py#L19)             |POST| /api/register/ |
+| [로그인](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/views.py#L17)                    |POST| /api/login/    |
+| [로그아웃](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/views.py#L69)                   |POST| /api/logout/   |
+| [JWT 유효성 검증 및 갱신](https://github.com/junhopark97/project/blob/447ec70c84b6d691787d9fc55c3343557541db5b/accounts/serializers.py#L100) |GET| /api/verify/   |
 
 <br />
 
