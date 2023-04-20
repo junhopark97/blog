@@ -1,11 +1,10 @@
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework import generics, status
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import CustomerAccessPermission
 from accounts.serializers import UserRegisterSerializer, UserLoginSerializer, UserVerifySerializer
 
 
@@ -41,7 +40,7 @@ class UserLoginView(generics.GenericAPIView):
 
 class UserVerifyView(generics.GenericAPIView):
     serializer_class = UserVerifySerializer
-    permission_classes = (CustomerAccessPermission,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         serializer = self.get_serializer(data=request)
@@ -67,7 +66,7 @@ class UserVerifyView(generics.GenericAPIView):
 
 
 class UserLogoutView(APIView):
-    permission_classes = (CustomerAccessPermission,)
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
