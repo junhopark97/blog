@@ -31,11 +31,11 @@ class Post(TimeStampedModel):
     tags = models.ManyToManyField(Tag, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users')
     title = models.CharField('TITLE', max_length=100)
-    slug = models.SlugField('SLUG', max_length=255, unique=True)
     image = models.ImageField('IMAGE', upload_to='blog/%Y/%m/', blank=True, null=True)
-    description = models.CharField('DESCRIPTION', max_length=100, blank=True, help_text='simple description text.')
     content = models.TextField('CONTENT')
-    like = models.PositiveSmallIntegerField('LIKE', default=0)
+    like = models.ManyToManyField(User, null=True)
+    # slug = models.SlugField('SLUG', max_length=255, unique=True)
+    # description = models.CharField('DESCRIPTION', max_length=100, blank=True, help_text='simple description text.')
 
     def __str__(self):
         return self.title
