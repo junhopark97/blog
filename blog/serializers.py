@@ -23,7 +23,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.email')
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
 
