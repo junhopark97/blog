@@ -1,7 +1,8 @@
 from rest_framework import generics, permissions
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from blog.models import Post
 from blog.serializers import PostSerializer
@@ -21,9 +22,13 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-# class PostViewSet(ModelViewSet):
-#     queryset = Post.objects.all().order_by('updated_at')
-#     serializer_class = PostSerializer
-#     permission_classes = (AllowAny,)
 
-    # pagination_class = PageNumberPagination
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def like_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+    return Response({'status': 'ok'})
