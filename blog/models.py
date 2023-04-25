@@ -33,9 +33,7 @@ class Post(TimeStampedModel):
     title = models.CharField('TITLE', max_length=100)
     image = models.ImageField('IMAGE', upload_to='blog/%Y/%m/', blank=True, null=True)
     content = models.TextField('CONTENT')
-    likes = models.ManyToManyField(User, null=True)
-    # slug = models.SlugField('SLUG', max_length=255, unique=True)
-    # description = models.CharField('DESCRIPTION', max_length=100, blank=True, help_text='simple description text.')
+    likes = models.ManyToManyField(User, related_name='like_posts', blank=True)
 
     def __str__(self):
         return self.title
