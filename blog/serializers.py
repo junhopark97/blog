@@ -16,9 +16,17 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id', 'author', 'post', 'content', 'parent_comment')
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('post', 'content', 'parent_comment')
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -30,7 +38,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = (
-            'pk', 'category', 'tags', 'author', 'title', 'image',
+            'id', 'category', 'tags', 'author', 'title', 'image',
             'content', 'likes', 'comments', 'created_at', 'updated_at',
         )
 

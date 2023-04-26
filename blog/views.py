@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
-from blog.models import Post
+from blog.models import Post, Comment
 from blog.permissions import CustomReadOnly
-from blog.serializers import PostSerializer, PostCreateSerializer
+from blog.serializers import PostSerializer, PostCreateSerializer, CommentSerializer, CommentCreateSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class PostViewSet(viewsets.ModelViewSet):
     filterset_fields = ['author', 'title']
 
     def get_serializer_class(self):
-        if self.action == 'list' or 'retrieve':
+        if self.action == 'list' or self.action == 'retrieve':
             return PostSerializer
         return PostCreateSerializer
 
@@ -28,19 +28,19 @@ class PostViewSet(viewsets.ModelViewSet):
         author = User.objects.get(email=self.request.user)
         serializer.save(author=author)
 
-# class PostListView(generics.ListCreateAPIView):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#     permission_classes = [CustomReadOnly]
-#
-#     def perform_create(self, serializer):
-#         serializer.save(author=self.request.user)
-#
-#
-# class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#     permission_classes = [CustomReadOnly]
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    permission_classes = [CustomReadOnly]
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return CommentSerializer
+        return CommentCreateSerializer
+
+    def perform_create(self, serializer):
+        author = User.objects.get(email=self.request.user)
+        serializer.save(author=author)
 
 
 @api_view(['GET'])
