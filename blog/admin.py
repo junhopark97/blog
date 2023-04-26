@@ -31,4 +31,9 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'post', 'author', 'short_content', 'created_at', 'updated_at',)
+    list_display = ('id', 'get_post_title', 'author', 'short_content', 'created_at', 'updated_at',)
+
+    def get_post_title(self, obj):
+        return obj.post.title
+
+    get_post_title.short_description = 'post'
