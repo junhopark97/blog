@@ -40,8 +40,8 @@ class Post(TimeStampedModel):
 
 
 class Comment(TimeStampedModel):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    author = models.CharField(max_length=50)
     content = models.TextField('content')
     parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
 
