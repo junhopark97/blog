@@ -14,8 +14,24 @@
 
 <br />
 
-### 🗒 POST
-~ing
+### 🗒 BLOG_POST
+| 기능 |Http Method| API |
+|-----|---|------|
+| 게시물 생성 |POST| /blog/posts/ |
+| 게시물 목록 조회 |GET| /blog/posts/ |
+| 게시물 id 조회 |GET| /blog/posts/<post_id>/ |
+| 게시물 수정 |PUT| /blog/posts/<post_id>/ |
+| 게시물 삭제 |DELETE| /blog/posts/<post_id>/ |
+
+<br />
+
+### 👍 LIKE_POST
+| 기능 |Http Method| API |
+|-----|---|------|
+| 게시물 좋아요 |POST| /blog/posts/like/<post_id>/ |
+
+
+<br />
 
 <hr/>
 
