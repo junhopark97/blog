@@ -25,6 +25,15 @@
 
 <br />
 
+### 📝 COMMENT
+| 기능 |Http Method| API |
+|-----|---|------|
+| 댓글 생성 |POST| /comments/ |
+| 댓글 삭제 |PUT| /comments/ |
+| 댓글 삭제 |DELETE| /comments/ |
+
+<br />
+
 ### 👍 LIKE_POST
 | 기능 |Http Method| API |
 |-----|---|------|
