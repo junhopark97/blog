@@ -48,9 +48,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    'corsheaders',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'django_filters',
-
+    'drf_yasg',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -205,3 +206,24 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
+}
+
+# REST_AUTH = {
+#     'USE_JWT': True,
+#     'JWT_AUTH_HTTPONLY': True,
+#     'JWT_AUTH_REFRESH_COOKIE': "refresh_token",
+#     'JWT_AUTH_COOKIE_USE_CSRF': True,
+#     'SESSION_LOGIN': False
+# }
