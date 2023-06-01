@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework import generics, status
 from rest_framework.exceptions import APIException
@@ -5,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import User
 from accounts.serializers import UserRegisterSerializer, UserLoginSerializer, UserVerifySerializer
 
 
@@ -41,8 +43,9 @@ class UserLoginView(generics.GenericAPIView):
 class UserVerifyView(generics.GenericAPIView):
     serializer_class = UserVerifySerializer
     permission_classes = (AllowAny,)
+    pagination_class = None
 
-    def get(self, request):
+    def post(self, request):
         serializer = self.get_serializer(data=request)
         data = serializer.to_internal_value(request)
 
