@@ -29,11 +29,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(
         write_only=True, required=True,
     )
-    token = serializers.SerializerMethodField()
+    # token = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'password2', 'gender', 'username', 'phone_number', 'token')
+        fields = ('email', 'password', 'password2', 'gender', 'username', 'phone_number')
+        # fields = ('email', 'password', 'password2', 'gender', 'username', 'phone_number', 'token')
 
     def validate(self, data):
         if data['password'] != data['password2']:
@@ -104,7 +105,8 @@ class UserVerifySerializer(serializers.BaseSerializer):  # noqa
     def to_internal_value(self, data):
         global jwt_dict
         jwt_token = data.COOKIES.get('jwt')
-        jwt_token = jwt_token.replace("\'", "\"")
+        # json.loads(jwt_token)
+        jwt_token = jwt_token.replace("\'", "\"")  # 수정해야 함.
 
         if not jwt_token:
             return {'message': 'JWT token not found.'}
