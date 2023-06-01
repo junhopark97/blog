@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -168,7 +168,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=100),  # timedelta(minutes=5)
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  # timedelta(minutes=5)
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -208,22 +208,24 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-      'Basic': {
-            'type': 'basic'
-      },
-      'Bearer': {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
-      }
-   }
+        },
+        # 'refresh_token': {
+        #     'type': 'apiKey',
+        #     'name': 'refresh_token',
+        #     'in': 'header',
+        # },
+    },
 }
 
-# REST_AUTH = {
-#     'USE_JWT': True,
-#     'JWT_AUTH_HTTPONLY': True,
-#     'JWT_AUTH_REFRESH_COOKIE': "refresh_token",
-#     'JWT_AUTH_COOKIE_USE_CSRF': True,
-#     'SESSION_LOGIN': False
-# }
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_REFRESH_COOKIE': "refresh_token",
+    'JWT_AUTH_COOKIE_USE_CSRF': False,
+    'SESSION_LOGIN': False
+}
